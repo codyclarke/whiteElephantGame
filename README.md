@@ -14,6 +14,25 @@ cmake --build build --config Release
 build/Release/steal_night.exe
 ```
 
+## Build for the handheld
+
+The handheld build uses the ARM compiler and Pico SDK. Get them by installing
+the **Raspberry Pi Pico** extension in VS Code and creating any one project
+with it (that downloads everything into `~/.pico-sdk`). Then:
+
+```bash
+python tools/pico.py flash hw_test
+```
+
+and then the game itself:
+
+```bash
+python tools/pico.py flash steal_night
+```
+
+`hw_test` is the wiring check; [WIRING.md](WIRING.md) says how to hook
+everything up and what the test should show.
+
 ## Controls (desktop)
 
 | Key | Handheld | Does |
@@ -100,6 +119,8 @@ screen takes turns with it every 8 seconds. Scores are saved in
 | `tools/png2sprite.py`, `tools/wav2sound.py` | Convert `assets/` into game data (run on every build) |
 | `platform/platform.h` | The only things the game may ask of the hardware |
 | `platform/sdl/` | Desktop backend (window, keyboard, sound) |
+| `platform/pico/` | Handheld backend: screen, sound and the wiring test; `pins.h` has the pin numbers |
+| `tools/pico.py` | Builds the handheld firmware and loads it onto the Pico |
 
 ## Making art
 

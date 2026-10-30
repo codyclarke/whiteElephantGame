@@ -1,0 +1,20 @@
+; I2S output for the MAX98357A amp: 16-bit stereo, one 32-bit FIFO word per
+; sample (one channel in the top half, the other in the bottom half).
+; Data goes out on one pin; the two side-set pins are BCLK and, right after
+; it, LRC. Two instructions per bit, so the state machine runs at
+; sample rate x 64.
+
+.program i2s_out
+.side_set 2                    ; bit 1 = LRC, bit 0 = BCLK
+
+bitloop1:
+    out pins, 1        side 0b10
+    jmp x-- bitloop1   side 0b11
+    out pins, 1        side 0b00   ; last bit of this channel: LRC flips one bit early, as I2S wants
+    set x, 14          side 0b01
+bitloop0:
+    out pins, 1        side 0b00
+    jmp x-- bitloop0   side 0b01
+    out pins, 1        side 0b10
+public entry_point:
+    set x, 14          side 0b11

@@ -1888,7 +1888,7 @@ void Game::draw_guest(Canvas& c, int seat) const {
     // Your turn timer, next to your name.
     if (is_player && phase_ == Phase::PlayerTurn) {
         int left = static_cast<int>(std::ceil(player_turn_seconds() - phase_time_));
-        char buf[8];
+        char buf[12];
         std::snprintf(buf, sizeof(buf), "%d", left < 0 ? 0 : left);
         c.text(p.x + 14, p.y + 23, buf, left <= 5 ? COL_DANGER : COL_GOLD);
     }

@@ -9,33 +9,39 @@ Gameplay design lives in [DESIGN.md](DESIGN.md).
 
 | Area | Choice |
 |---|---|
-| MCU | Raspberry Pi Pico 2 (RP2350), via Pimoroni Pico LiPo 2 (built-in charging) |
-| Display | 2.8" 320x240 SPI TFT (ILI9341 or ST7789, no touch), landscape. The game's 240x240 picture sits in the middle with a 40-pixel strip on each side |
+| MCU | Waveshare RP2350-Plus (RP2350A, Pico pin layout, USB-C, built-in LiPo charging) |
+| Display | 2.8" 320x240 SPI TFT, ST7789V controller (confirmed by reading its ID), landscape. The game's 240x240 picture sits in the middle with a 40-pixel strip on each side |
 | Input | Separate buttons in the case: a 5-way switch or D-pad (up/down/left/right/press) + A/B/X/Y tactile buttons |
 | Audio | MAX98357A I2S amp + small 8 ohm speaker (replaces the piezo, so WAV sounds and music can play) |
-| Power | 2000 mAh single-cell LiPo (JST-PH, protected; check polarity) + slide switch; boots straight into the game |
+| Power | 2000 mAh single-cell LiPo (protected; plug must match the board's battery socket, check polarity) + slide switch; boots straight into the game |
 | Language | C++ (plain, readable; no clever templates) |
 | Desktop build | Same game code compiled for Windows with SDL2 (window, keyboard, sound) |
 | Look | Full color, with the option to emulate a segmented-LCD / monochrome look |
 
 ## Shopping list
 
-- Pimoroni Pico LiPo 2 (RP2350, USB-C, LiPo charging)
-- 2.8" 320x240 SPI TFT module, ILI9341 or ST7789, 3.3 V logic. Chosen: the red
+- Waveshare RP2350-Plus (RP2350A, USB-C, LiPo charging) -- arrived
+- 2.8" 320x240 SPI TFT module, 3.3 V logic. Got: the red (ST7789V inside, despite most listings saying ILI9341)
   "2.8\" TFT 240xRGBx320" module (82 x 50 mm board, 14-pin header, touch and SD
   slot on board but unused)
 - MAX98357A I2S amp breakout + 8 ohm speaker (about 0.5–1 W, 28–40 mm)
-- 2000 mAh 1S LiPo with JST-PH plug and protection circuit
+- 2000 mAh 1S LiPo with protection circuit, and a plug that fits the
+  RP2350-Plus battery socket (Waveshare uses a small 2-pin socket, likely
+  MX1.25, not JST-PH: check before buying or plugging in)
 - 5-way navigation switch (or a D-pad) + 4 tactile buttons (12 mm)
 - Slide switch, hookup wire, enclosure
 
 ## Wiring (draft)
 
-A starting point; check it against the Pico LiPo 2 pinout when the boards
+Step-by-step breadboard guide, with physical pin numbers and what the test
+should show: [WIRING.md](WIRING.md).
+
+A starting point; check it against the RP2350-Plus pinout when the boards
 arrive, and the pins get locked into the Pico code then. Buttons connect
 between the pin and GND (the Pico's internal pull-ups are used). GP4/GP5 are
-left free for the board's Qw/ST connector; GP23-25 and GP29 are left alone
-(on-board use, battery sensing).
+left free. The Waveshare RP2350-Plus has the regular Pico pin layout; its
+battery voltage is on GP29 (from the SDK's `waveshare_rp2350_plus_4mb` board
+file), so GP29 stays free.
 
 | Part | Signal | Pico pin |
 |---|---|---|
@@ -96,11 +102,15 @@ Rule: `game/` only talks to `platform.h`. If it compiles on the PC, it runs on t
    Idle screen (simulated snow on a random tree) and sleep. 320x240 screen
    layout with reactive string lights in the side strips.
    Remaining: shake hints, hiccups, HR strikes.
-4. Hardware arrives -> Pico backend (TFT driver, buttons, I2S audio, flash
-   saves), boot-to-game. Sleep: implement
-   `platform::set_backlight()` and drop into low power while
-   `Game::sleeping()`, waking on a button. Make `Game` static (it holds the
-   snow scene, about 80 KB). Battery gauge from the LiPo voltage.
+4. Hardware arrives -> Pico backend.
+   Done (2026-10-30): screen confirmed as ST7789V, clean at 75 MHz SPI on the
+   breadboard (full frame in ~16 ms, sent by DMA while the next update runs).
+   The game runs on the RP2350-Plus: title ~3 ms of work per frame, snowy
+   idle screen ~7 ms (budget 33 ms). Backend in platform/pico/: GPIO buttons,
+   I2S audio (PIO + DMA), saves in the last flash sector, backlight and amp
+   off while asleep, `Game` held in static memory (267 KB of 520 KB RAM used).
+   Remaining: test buttons, sound and saves once wired; true low-power sleep
+   (wake on a button); battery gauge from GP29.
 5. Art, sound, polish, tuning
 6. Enclosure + physical build
 7. Party
