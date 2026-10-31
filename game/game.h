@@ -169,6 +169,9 @@ private:
     void draw_initials(gfx::Canvas& c) const;
     void draw_high_scores(gfx::Canvas& c) const;
     void update_lights(float dt);
+    void update_volume(const Input& in, float dt);
+    void apply_volume() const;
+    void draw_volume(gfx::Canvas& c) const;
     void draw_strip(gfx::Canvas& c, int side) const;  // string lights; side 0 = left, 1 = right
 
     State state_ = State::Title;
@@ -261,6 +264,10 @@ private:
 
     // String lights in the side strips.
     float lights_clock_ = 0.0f;  // runs faster the drunker you are
+    int volume_ = tuning::VOLUME_START;  // 0 = mute .. tuning::VOLUME_STEPS
+    float volume_shown_ = 0.0f;          // seconds left of the volume bar on screen
+    float volume_repeat_ = 0.0f;         // countdown to the next step while a volume button is held
+    float volume_save_in_ = 0.0f;        // saves once the buttons have been left alone this long
     float lights_flash_ = 0.0f;  // seconds left of the gold chase after your steal
 
     char ticker_[96] = {};

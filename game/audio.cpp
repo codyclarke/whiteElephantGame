@@ -29,6 +29,7 @@ uint32_t music_pos = 0;
 int beep_left = 0;        // samples
 uint32_t beep_phase = 0;  // 16.16 fixed point
 uint32_t beep_step = 0;
+int master = 256;  // master volume, 256 = full; one int, so safe to change without the lock
 
 // "steal" -> "sounds/steal"
 const Sound* find_in(const char* folder, const char* name) {
@@ -94,7 +95,14 @@ void stop_music() {
     platform::audio_unlock();
 }
 
+void set_master_volume(float gain) {
+    if (gain < 0.0f) gain = 0.0f;
+    if (gain > 1.0f) gain = 1.0f;
+    master = static_cast<int>(gain * 256.0f);
+}
+
 void mix(int16_t* out, int count) {
+    const int level = master;
     // Samples are -127..127; a volume of 256 brings them up to full 16-bit range.
     const int music_volume = static_cast<int>(tuning::MUSIC_VOLUME * 256.0f);
     const int sfx_volume = static_cast<int>(tuning::SFX_VOLUME * 256.0f);
@@ -120,6 +128,7 @@ void mix(int16_t* out, int count) {
             --beep_left;
         }
 
+        sample = sample * level / 256;
         if (sample > 32767) sample = 32767;
         if (sample < -32768) sample = -32768;
         out[i] = static_cast<int16_t>(sample);

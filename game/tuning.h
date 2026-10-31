@@ -185,14 +185,14 @@ struct ScratchPrize {
 };
 inline constexpr ScratchPrize SCRATCH_PRIZES[] = {
     // value  weight
-    {  2,     30},
-    {  5,     25},
+    {  2,     20},
+    {  5,     20},
     { 10,     18},
     { 20,     12},
-    { 40,      8},
-    { 75,      4},
-    {150,      2},
-    {500,      1},  // jackpot
+    { 40,     10},
+    { 75,      8},
+    {150,      7},
+    {500,      5},  // jackpot
 };
 inline constexpr float SCRATCH_SECONDS = 0.5f;        // holding A to clear one spot
 inline constexpr float SCRATCH_DRUNK_SLIP = 1.5f;     // chance/sec at full drunk your hand slips to another spot mid-scratch
@@ -205,6 +205,13 @@ inline constexpr float NEEDLE_DRUNK_TREMBLE = 6.0f;   // degrees of buzz-needle 
 inline constexpr float MUSIC_VOLUME = 0.45f;  // 0..1; music sits under the effects
 inline constexpr float SFX_VOLUME = 0.8f;     // 0..1; WAV sound effects
 inline constexpr float BEEP_VOLUME = 0.08f;   // 0..1; fallback beeps for events with no WAV yet
+
+// Volume buttons: levels 0 (mute) to VOLUME_STEPS. Saved with your look.
+inline constexpr int   VOLUME_STEPS = 10;
+inline constexpr int   VOLUME_START = 7;               // before anything is saved
+inline constexpr float VOLUME_REPEAT_DELAY = 0.4f;     // hold a volume button this long...
+inline constexpr float VOLUME_REPEAT_SECONDS = 0.12f;  // ...then it steps this often
+inline constexpr float VOLUME_SHOW_SECONDS = 1.5f;     // how long the volume bar stays up
 
 // --- Scoring ---------------------------------------------------------------
 inline constexpr float SWEET_SPOT_POINTS_PER_SECOND = 0.5f;

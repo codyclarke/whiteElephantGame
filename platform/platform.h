@@ -7,8 +7,9 @@
 // PC, it will run on the handheld.
 namespace platform {
 
-// Button bits. Matches the Waveshare Pico-LCD-1.3: a 5-way joystick plus
-// A / B / X / Y keys.
+// Button bits: a D-pad (with an optional press), A / B / X / Y, and two
+// volume buttons. The game handles volume itself; the volume buttons never
+// count as game input.
 enum : uint16_t {
     BTN_UP    = 1 << 0,
     BTN_DOWN  = 1 << 1,
@@ -19,6 +20,8 @@ enum : uint16_t {
     BTN_B     = 1 << 6,
     BTN_X     = 1 << 7,
     BTN_Y     = 1 << 8,
+    BTN_VOL_UP   = 1 << 9,
+    BTN_VOL_DOWN = 1 << 10,
 };
 
 uint16_t buttons();                    // bitmask of buttons held right now

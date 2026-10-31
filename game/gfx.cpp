@@ -134,6 +134,7 @@ int Canvas::text_wrapped(int cx, int y, const char* s, Color c, int max_width, i
             if (take == 0) take = max_chars;
         }
         if (take > static_cast<int>(sizeof(line)) - 1) take = sizeof(line) - 1;
+        if (take < 1) take = 1;  // too narrow for even one letter: still make progress
         std::memcpy(line, s, take);
         line[take] = '\0';
         int end = take;

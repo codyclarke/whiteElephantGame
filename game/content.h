@@ -9,8 +9,8 @@
 // (longer ones scroll, which is fine but slower to read).
 namespace content {
 
-inline constexpr const char* TITLE_TOP    = "STEAL";
-inline constexpr const char* TITLE_BOTTOM = "NIGHT";
+inline constexpr const char* TITLE_TOP    = "YULE";
+inline constexpr const char* TITLE_BOTTOM = "MASTER";
 inline constexpr const char* SUBTITLE     = "A White Elephant Party";
 
 // --- High scores ------------------------------------------------------------

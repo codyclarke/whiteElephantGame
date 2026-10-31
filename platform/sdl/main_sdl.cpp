@@ -1,12 +1,13 @@
 // Desktop backend: runs the game in a window with keyboard controls and sound.
 //
 // Controls: arrow keys = joystick, A = act (handheld A), S = hide (handheld X),
-//           D = drink (handheld B), Enter = pause (handheld Y), Esc = quit.
+//           D = drink (handheld B), Enter = pause (handheld Y),
+//           - and = = volume down / up, Esc = quit.
 //
 // Test mode (no window, runs as fast as possible, saves a screenshot):
 //   steal_night --shot out.bmp --frames 300 --script "30:A 60:B 61-70:RIGHT"
 // Script entries are FRAME:BUTTONS or FIRST-LAST:BUTTONS, buttons joined by
-// commas (UP DOWN LEFT RIGHT PRESS A B X Y). The game runs at 30 frames/sec.
+// commas (UP DOWN LEFT RIGHT PRESS A B X Y VOLUP VOLDOWN). The game runs at 30 frames/sec.
 // Add --scene scratch or --scene builder to start on the lottery scratcher or
 // the character builder, --scene initials to enter initials for a $500 run,
 // or --scene idle for the snowy-tree idle screen. --seed N changes the random
@@ -64,6 +65,8 @@ uint16_t keyboard_buttons() {
     if (k[SDL_SCANCODE_S]) b |= platform::BTN_X;       // hide
     if (k[SDL_SCANCODE_D]) b |= platform::BTN_B;       // drink
     if (k[SDL_SCANCODE_RETURN]) b |= platform::BTN_Y;  // pause
+    if (k[SDL_SCANCODE_EQUALS] || k[SDL_SCANCODE_KP_PLUS]) b |= platform::BTN_VOL_UP;
+    if (k[SDL_SCANCODE_MINUS] || k[SDL_SCANCODE_KP_MINUS]) b |= platform::BTN_VOL_DOWN;
     return b;
 }
 
@@ -83,6 +86,7 @@ uint16_t button_from_name(const std::string& name) {
         {"UP", platform::BTN_UP},   {"DOWN", platform::BTN_DOWN}, {"LEFT", platform::BTN_LEFT},
         {"RIGHT", platform::BTN_RIGHT}, {"PRESS", platform::BTN_PRESS}, {"A", platform::BTN_A},
         {"B", platform::BTN_B},     {"X", platform::BTN_X},       {"Y", platform::BTN_Y},
+        {"VOLUP", platform::BTN_VOL_UP}, {"VOLDOWN", platform::BTN_VOL_DOWN},
     };
     for (const auto& n : NAMES) {
         if (name == n.name) return n.bit;
