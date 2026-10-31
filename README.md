@@ -42,9 +42,11 @@ everything up and what the test should show.
 | S (hold) | X | Hide your gift |
 | D | B | Call the drink tray, then grab the drink under your hand |
 | Enter | Y | Pause |
+| - / = | Volume buttons | Volume down / up (any screen; hold to keep stepping) |
 | Esc | - | Quit |
 
-Test-mode scripts still use the handheld's button names (`A B X Y`).
+Test-mode scripts still use the handheld's button names (`A B X Y`, and
+`VOLUP` / `VOLDOWN`).
 
 ## Side strips: string lights
 

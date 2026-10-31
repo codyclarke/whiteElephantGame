@@ -79,6 +79,12 @@ use two **diagonally opposite** legs and it's guaranteed to switch.
 | B | GP13 (17) |
 | X | GP14 (19) |
 | Y | GP15 (20) |
+| Volume down | GP26 (31) |
+| Volume up | GP27 (32) |
+
+Use the same kind of button for both volume buttons, side by side, with
+volume up on the right (or on top). They're separate from the game buttons:
+in the game they work on every screen and never count as a move.
 
 In the test, each button's box lights green while you hold it. If the wrong
 box lights, two wires are swapped. If a box is lit without touching anything,
@@ -101,6 +107,45 @@ Speaker wires go to the amp's **+** and **−** terminals, never to GND.
 In the test, every button plays its own note while held. If there's no
 sound, check DIN, BCLK and LRC first; LRC has to be on the pin right after
 BCLK.
+
+## 4. Battery and power switch
+
+Do this last, once everything works on USB. The switch goes in the
+battery's **+** wire, so "off" disconnects the battery completely and
+nothing drains it while the handheld sits in a drawer.
+
+You need:
+
+- A small **slide switch** (SPDT, the common 3-leg kind) rated for at
+  least **1 A**. Panel-mount or one with mounting holes is easiest to fit
+  in a case later.
+- A short **battery extension lead** with the same 2-pin plug as the
+  RP2350-Plus battery socket (one plug, one socket). The switch goes into
+  this lead, so the battery's own wires never get cut.
+
+Wiring:
+
+| From | To |
+|---|---|
+| Extension lead red (+), battery side | Switch **middle** leg |
+| Switch **outer** leg (either one) | Extension lead red (+), board side |
+| Extension lead black (−) | Straight through, not switched |
+
+The switch's other outer leg stays unused. Cut and join one wire at a time,
+cover each joint with heat-shrink, and never let bare battery wires touch:
+a LiPo can push a lot of current through a short.
+
+How it behaves:
+
+- **Off:** the battery is disconnected. Zero drain.
+- **On:** the handheld runs from the battery.
+- **USB plugged in:** it runs from USB either way, but the battery only
+  **charges with the switch on**. To charge, plug it in and switch it on.
+  The screen goes to sleep on its own after a few minutes.
+
+(Why not use the board's 3V3_EN pin as the switch: that only turns off the
+3.3 V supply. The amp, which runs straight from the battery side, and the
+charger would stay connected and slowly drain the battery.)
 
 ## Building and flashing
 

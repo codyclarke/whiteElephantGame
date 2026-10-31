@@ -47,5 +47,7 @@ constexpr uint BTN_A = 12;
 constexpr uint BTN_B = 13;
 constexpr uint BTN_X = 14;
 constexpr uint BTN_Y = 15;
+constexpr uint BTN_VOL_UP = 27;
+constexpr uint BTN_VOL_DOWN = 26;
 
 }  // namespace pins

@@ -38,7 +38,8 @@ constexpr ButtonPin BUTTON_PINS[] = {
     {pins::BTN_LEFT, platform::BTN_LEFT},   {pins::BTN_RIGHT, platform::BTN_RIGHT},
     {pins::BTN_PRESS, platform::BTN_PRESS}, {pins::BTN_A, platform::BTN_A},
     {pins::BTN_B, platform::BTN_B},         {pins::BTN_X, platform::BTN_X},
-    {pins::BTN_Y, platform::BTN_Y},
+    {pins::BTN_Y, platform::BTN_Y},         {pins::BTN_VOL_UP, platform::BTN_VOL_UP},
+    {pins::BTN_VOL_DOWN, platform::BTN_VOL_DOWN},
 };
 
 // Too big for the stack (the game holds the snow scene, the canvas is the

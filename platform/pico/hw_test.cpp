@@ -42,6 +42,7 @@ constexpr Button BUTTONS[] = {
     {pins::BTN_PRESS, "PR", 52, 142, 392.0f},  {pins::BTN_A, "A", 262, 142, 440.0f},
     {pins::BTN_B, "B", 232, 172, 494.0f},      {pins::BTN_X, "X", 232, 112, 523.0f},
     {pins::BTN_Y, "Y", 202, 142, 587.0f},
+    {pins::BTN_VOL_DOWN, "V-", 132, 176, 659.0f}, {pins::BTN_VOL_UP, "V+", 162, 176, 698.0f},
 };
 constexpr int BUTTON_COUNT = sizeof BUTTONS / sizeof BUTTONS[0];
 

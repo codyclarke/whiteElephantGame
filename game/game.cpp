@@ -237,6 +237,7 @@ Game::Game(uint32_t seed) : rng_(seed) {
     for (int i = 0; i < HAT_COUNT; ++i) spr_hat_[i] = named_sprite("people/hats", content::HATS[i].name);
 
     load();
+    apply_volume();
     audio::play_music("title");
 }
 
@@ -268,7 +269,16 @@ void Game::set_state(State s) {
     }
 }
 
-void Game::update(const Input& in, float dt) {
+void Game::update(const Input& raw, float dt) {
+    // The volume buttons work on every screen and are never game input --
+    // except that, like any button, they wake the screen from sleep.
+    Input in = raw;
+    if (state_ != State::Sleep) {
+        update_volume(raw, dt);
+        in.held &= ~(BTN_VOL_UP | BTN_VOL_DOWN);
+        in.pressed &= ~(BTN_VOL_UP | BTN_VOL_DOWN);
+    }
+
     state_time_ += dt;
     update_lights(dt);
 
@@ -702,8 +712,19 @@ struct SaveData {
     char initials[4];  // last initials entered
     int32_t score_count;
     content::HighScore scores[tuning::HIGH_SCORE_COUNT];
+    int32_t volume;
 };
-constexpr uint32_t SAVE_MAGIC = 0x534E4C32;  // "SNL2"
+constexpr uint32_t SAVE_MAGIC = 0x534E4C33;  // "SNL3"
+
+// The second format: everything above but the volume.
+struct SaveDataV2 {
+    uint32_t magic;
+    content::Look look;
+    char initials[4];
+    int32_t score_count;
+    content::HighScore scores[tuning::HIGH_SCORE_COUNT];
+};
+constexpr uint32_t SAVE_MAGIC_V2 = 0x534E4C32;  // "SNL2"
 
 // The first save format, from before high scores: just your look.
 struct SaveDataV1 {
@@ -728,6 +749,7 @@ void Game::save() const {
     std::memcpy(save.initials, initials_, sizeof(save.initials));
     save.score_count = score_count_;
     for (int i = 0; i < score_count_; ++i) save.scores[i] = scores_[i];
+    save.volume = volume_;
     platform::save_data(&save, sizeof(save));
 }
 
@@ -737,10 +759,12 @@ void Game::load() {
     SaveData save{};
     uint32_t got = platform::load_data(&save, sizeof(save));
     bool current = got == sizeof(SaveData) && save.magic == SAVE_MAGIC;
+    bool v2 = got == sizeof(SaveDataV2) && save.magic == SAVE_MAGIC_V2;  // same layout, minus the volume
     bool v1 = got == sizeof(SaveDataV1) && save.magic == SAVE_MAGIC_V1;
-    if (!current && !v1) return;
+    if (!current && !v2 && !v1) return;
 
-    if (current) {
+    if (current && save.volume >= 0 && save.volume <= tuning::VOLUME_STEPS) volume_ = save.volume;
+    if (current || v2) {
         if (three_letters(save.initials)) std::memcpy(initials_, save.initials, sizeof(initials_));
         bool ok = save.score_count >= 0 && save.score_count <= tuning::HIGH_SCORE_COUNT;
         for (int i = 0; ok && i < save.score_count; ++i) ok = save.scores[i].initials[3] == '\0';
@@ -1477,6 +1501,78 @@ void Game::render(Canvas& c) const {
         case State::Sleep:
             c.clear(0);
             break;
+    }
+
+    if (volume_shown_ > 0.0f && state_ != State::Sleep) draw_volume(c);
+}
+
+// --- Volume ---------------------------------------------------------------------
+//
+// Two buttons step the volume up and down, on any screen. Holding one keeps
+// stepping. A bar shows the level for a moment, each step ticks at the new
+// volume, and the level is saved once the buttons are left alone.
+
+void Game::update_volume(const Input& in, float dt) {
+    const uint16_t both = BTN_VOL_UP | BTN_VOL_DOWN;
+    int step = 0;
+    if (in.pressed & both) {
+        step = (in.pressed & BTN_VOL_UP) ? 1 : -1;
+        volume_repeat_ = tuning::VOLUME_REPEAT_DELAY;
+    } else if (in.held & both) {
+        volume_repeat_ -= dt;
+        if (volume_repeat_ <= 0.0f) {
+            step = (in.held & BTN_VOL_UP) ? 1 : -1;
+            volume_repeat_ = tuning::VOLUME_REPEAT_SECONDS;
+        }
+    }
+
+    if (step) {
+        int v = volume_ + step;
+        if (v < 0) v = 0;
+        if (v > tuning::VOLUME_STEPS) v = tuning::VOLUME_STEPS;
+        if (v != volume_) {
+            volume_ = v;
+            apply_volume();
+            volume_save_in_ = 2.0f;
+        }
+        volume_shown_ = tuning::VOLUME_SHOW_SECONDS;
+        audio::play("volume", 1000, 30);  // hear the new level (silent at mute)
+    }
+
+    if (volume_shown_ > 0.0f) volume_shown_ -= dt;
+    if (volume_save_in_ > 0.0f) {
+        volume_save_in_ -= dt;
+        if (volume_save_in_ <= 0.0f) save();
+    }
+}
+
+// Volume steps feel even to the ear when the gain grows with the square.
+void Game::apply_volume() const {
+    float t = static_cast<float>(volume_) / tuning::VOLUME_STEPS;
+    audio::set_master_volume(t * t);
+}
+
+// A small panel at the top: a speaker, then one segment per level.
+void Game::draw_volume(Canvas& c) const {
+    c.game_area();
+    const int w = 10 + 12 + tuning::VOLUME_STEPS * 7 + 6;
+    const int x = (W - w) / 2, y = 6;
+    c.fill_rect(x, y, w, 20, COL_HUD);
+    c.rect(x, y, w, 20, COL_DIM);
+
+    // Speaker: a box and a cone.
+    c.fill_rect(x + 6, y + 8, 3, 5, COL_TEXT);
+    for (int i = 0; i < 4; ++i) c.fill_rect(x + 9 + i, y + 7 - i, 1, 7 + i * 2, COL_TEXT);
+
+    int sx = x + 22;
+    if (volume_ == 0) {
+        c.text(sx, y + 7, "MUTE", COL_DANGER);
+        return;
+    }
+    for (int i = 0; i < tuning::VOLUME_STEPS; ++i) {
+        int h = 4 + i;  // segments climb like a ramp
+        bool on = i < volume_;
+        c.fill_rect(sx + i * 7, y + 16 - h, 5, h, on ? COL_GOLD : COL_STRIP);
     }
 }
 

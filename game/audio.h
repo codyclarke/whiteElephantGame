@@ -27,6 +27,9 @@ void beep(uint16_t hz, uint16_t ms);
 void play_music(const char* name);
 void stop_music();
 
+// Master volume over everything, 0 (silent) .. 1 (full).
+void set_master_volume(float gain);
+
 // Fill out with the next count samples (mono, signed 16-bit).
 // Platforms call this from their audio callback.
 void mix(int16_t* out, int count);

@@ -29,7 +29,10 @@ Gameplay design lives in [DESIGN.md](DESIGN.md).
   RP2350-Plus battery socket (Waveshare uses a small 2-pin socket, likely
   MX1.25, not JST-PH: check before buying or plugging in)
 - 5-way navigation switch (or a D-pad) + 4 tactile buttons (12 mm)
-- Slide switch, hookup wire, enclosure
+- 2 more tactile buttons (same type as each other) for volume up / down
+- Slide switch (SPDT, rated 1 A or more) for the battery + wire, and a short
+  battery extension lead with the board's battery plug, to put it in
+- Hookup wire, heat-shrink, enclosure
 
 ## Wiring (draft)
 
@@ -60,6 +63,8 @@ file), so GP29 stays free.
 | Amp | VIN, GND | VSYS (battery side, for more volume), GND |
 | Buttons | Up / Down / Left / Right / Press | GP0 / GP1 / GP2 / GP3 / GP6 |
 | Buttons | A / B / X / Y | GP12 / GP13 / GP14 / GP15 |
+| Buttons | Volume down / up | GP26 / GP27 |
+| Power | Slide switch | In the battery's + wire (see WIRING.md, step 4) |
 
 ## Architecture
 
