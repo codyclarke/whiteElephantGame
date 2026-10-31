@@ -55,7 +55,6 @@ constexpr uint8_t ST7789_INIT[] = {
     0x01, DELAY,                         // software reset
     0x11, DELAY,                         // wake up
     0x3A, 1, 0x55,                       // 16 bits per pixel
-    0x21, 0,                             // these panels want inverted colors
     0x13, 0,                             // normal mode
     0x29, DELAY,                         // display on
 };
@@ -77,6 +76,7 @@ void run(const uint8_t* list, size_t size) {
 // next frame puts it right.
 void set_window() {
     command(0x36, &pins::LCD_MADCTL, 1);
+    command(pins::LCD_INVERT ? 0x21 : 0x20);  // color inversion on / off
     const uint8_t cols[] = {0, 0, (WIDTH - 1) >> 8, (WIDTH - 1) & 0xFF};
     const uint8_t rows[] = {0, 0, (HEIGHT - 1) >> 8, (HEIGHT - 1) & 0xFF};
     command(0x2A, cols, 4);

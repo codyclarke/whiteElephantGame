@@ -59,7 +59,7 @@ Flash the test (see below). You should see:
 | Backlight on, plain white, or striped garbage | Check CS, DC, RESET, SDI, SCK. Then wire SDO to GP4: the test prints the chip's ID over USB. 85 85 52 (or 42 C2 A9) is an ST7789, 00 93 41 an ILI9341; set `LCD_ST7789` in pins.h to match |
 | Picture mirrored or upside down | Change `LCD_MADCTL` in pins.h: try `0x28`, `0x68`, `0xA8`, `0xE8` (ST7789: `0x60`, `0x20`, `0xA0`, `0xE0`); one of them is right |
 | Red and blue swapped | Add or remove `0x08` in `LCD_MADCTL` (e.g. `0x28` becomes `0x20`) |
-| Colors inverted (like a photo negative) | Wrong controller setting: flip `LCD_ST7789` |
+| Colors inverted (like a photo negative) | Flip `LCD_INVERT` in pins.h |
 | Stripes, speckles or flicker | Bits are getting garbled on the wires. The test starts at a slow 10 MHz; Y (or a jumper from GP15 to GND, before the buttons are wired) steps up through 20, 37.5 and 75 MHz. Note the fastest speed that stays clean. Shorter wires, firm connections on SCK and SDI, and a second GND wire all help |
 
 ## 2. The buttons

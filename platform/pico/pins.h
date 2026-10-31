@@ -19,6 +19,10 @@ constexpr uint LCD_MISO = 4;  // "SDO (MISO)": optional, only for reading the sc
 // ID if SDO is wired to GP4.
 constexpr bool LCD_ST7789 = true;
 
+// Some screens show colors like a photo negative unless inversion is on
+// (common on ST7789 IPS panels). Ours looks right with it off.
+constexpr bool LCD_INVERT = false;
+
 // Which way up the picture is. If the test image is mirrored or upside down,
 // see the table in WIRING.md.
 constexpr uint8_t LCD_MADCTL = LCD_ST7789 ? 0x60 : 0x28;
